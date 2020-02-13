@@ -35,7 +35,7 @@ router.post('/registers', async (req, res, next) => {
     }
 });
 
-router.post('/logins', async (req,res, next) => {
+router.post('/temp', async (req,res, next) => {
 
     const {error} = loginValidation(req.body);
 
