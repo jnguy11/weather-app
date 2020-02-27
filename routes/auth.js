@@ -5,7 +5,22 @@ const bcrypt = require('bcryptjs');
 const Sentry = require('@sentry/node');
 const { registerValidation, loginValidation }= require('../validation');
 
-
+/**
+ * @api {get} /registers Request User information
+ * @apiName Register
+ * @apiGroup register
+ *
+ 
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Not Found
+ *     {
+ *       "error": "email existed in server"
+ *     }
+ * 
+ * @api {get} "/registers 
+ */
 router.post('/registers', async (req, res, next) => {
 
     const {error} = registerValidation(req.body);
