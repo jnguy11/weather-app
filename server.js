@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const authRoute = require('./routes/auth');
 const postRoute = require('./routes/posts');
-const verify = require('./routes/tokenVerify');
+const Sentry = require('@sentry/node');
+Sentry.init({ dsn: 'https://a74cbeb34c6c464f998ba98c08226192@sentry.io/3005799' });
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ mongoose.connect(process.env.DB_CONNECT,
     { useNewUrlParser: true, useUnifiedTopology: true },
     () => console.log('connected to db')
 );
+
+app.use(Sentry.Handlers.requestHandler());
 
 app.use(express.json()); // Allows you to send post requests
 
@@ -31,7 +34,8 @@ app.get("/", (req, res) => {
 });
 
 app.post('/registers', authRoute, function (req, res) {
-    res.sendFile("./public/index.html", { root: __dirname })
+    res.sendFile("./public/index.html", { root: __dirname });
+    
 });
 
 app.post('/logins', authRoute, function (req, res) {
@@ -39,6 +43,17 @@ app.post('/logins', authRoute, function (req, res) {
     res.sendFile('./private/app.html', { root: __dirname });
 });
 
-// app.use("/auth", authRoute);
+app.get('/debug-sentry', function mainHandler(req, res) {
+    throw new Error('My first Sentry error!');
+  });
+
+app.use(Sentry.Handlers.errorHandler());
+
+app.use(function onError(err, req, res, next) {
+    // The error id is attached to `res.sentry` to be returned
+    // and optionally displayed to the user for support.
+    res.statusCode = 500;
+    res.end(res.sentry + "\n");
+});
 
 app.listen(4000, () => console.log('Server is running'));

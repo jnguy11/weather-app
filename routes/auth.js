@@ -2,20 +2,26 @@ const router = require('express').Router();
 const User = require('../model/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const Sentry = require('@sentry/node');
 const { registerValidation, loginValidation }= require('../validation');
+
 
 router.post('/registers', async (req, res, next) => {
 
     const {error} = registerValidation(req.body);
 
     if (error) {
+        Sentry.captureMessage(error.details[0].message);
         return res.status(400).send(error.details[0].message);
+
     }
 
     const emailExists = await User.findOne({email: req.body.email});
 
     if(emailExists) {
+        Sentry.captureMessage('User tried to sign-up with a pre-existing email already exists.');
         return res.status(400).send('Email already exists.');
+
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -32,26 +38,30 @@ router.post('/registers', async (req, res, next) => {
         next();
     } catch (err) {
         res.status(400).send(err);
+
     }
 });
 
-router.post('/temp', async (req,res, next) => {
+router.post('/logins', async (req,res, next) => {
 
     const {error} = loginValidation(req.body);
 
     if (error) {
+        Sentry.captureMessage(error.details[0].message);
         return res.status(400).send(error.details[0].message);
     }
 
     const user = await User.findOne({email: req.body.email});
 
     if(!user) {
+        Sentry.captureMessage('User tried to log in with an unregistered email.');
         return res.status(400).send('Email not found.');
     }
 
     const validPassword = await bcrypt.compare(req.body.password, user.password);
 
     if(!validPassword) {
+        Sentry.captureMessage('User typed an incorrect password.');
         return res.status(400).send('Invalid password.');
     }
 
