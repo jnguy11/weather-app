@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Sentry = require('@sentry/node');
 
+
 module.exports = function (req, res, next) {
     const token = req.header('auth-token');
 

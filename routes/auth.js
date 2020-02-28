@@ -16,7 +16,7 @@ const { registerValidation, loginValidation }= require('../validation');
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 400 Not Found
  *     {
- *       "error": "email existed in server"
+ *       "error": "Email already exists"
  *     }
  * 
  * @api {get} "/registers 
