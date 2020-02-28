@@ -28,7 +28,22 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(express.static(__dirname + "/public"));
+/**
+ * @api {get} "./"  get the default localhost
+ * @apiName default
+ * @apiGroup default port
+ *
+ * @apiParam :4000
+ *
+ * @apiSuccess requires :4000 after localhost
+ * 
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     will response with serving the ./index.html file
+ * when successful
 
+ */
 app.get("/", (req, res) => {
     res.sendFile("./index.html")
 });
